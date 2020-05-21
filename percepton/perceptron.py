@@ -34,6 +34,31 @@ class Perceptron:
         return self.w, self.b
 
 
+class DualPerceptron:
+    def __init__(self, x, y, lr=0.1):
+        self.x = x
+        self.y = y
+        self.lr = lr
+        self.alpha = np.random.uniform(0, 1, size=(x.shape[0], ))  # 初始化alpha
+        self.b = 0  # 初始化b
+        self.gram = np.dot(self.x, np.transpose(self.x))  # gram矩阵
+        self.done = False
+
+    def train(self):
+        while not self.done:
+            index = -1
+            for i in range(self.x.shape[0]):
+                if self.y[i] != sign(np.dot(self.alpha, self.gram[i] * self.y) + self.b):
+                    index = i
+                    break
+            if index == -1:
+                break
+            self.alpha[index] += self.lr
+            self.b += self.lr * self.y[index]
+        w = np.dot(np.transpose(self.x) * self.y, self.alpha)
+        return w, self.b
+
+
 if __name__ == '__main__':
     data = pd.read_csv("./train_data.csv")
     train_x = data.loc[:, ["x1", "x2"]].values
@@ -41,8 +66,10 @@ if __name__ == '__main__':
     class_1 = np.where(train_y > 0)
     class_2 = np.where(train_y < 0)
 
-    perceptron = Perceptron(train_x, train_y)
-    w, b = perceptron.train()
+    # model = Perceptron(train_x, train_y)
+    model = DualPerceptron(train_x, train_y)
+    # print(model.gram)
+    w, b = model.train()
 
     line_x = np.arange(0, 10, 1)
     line_y = - (w[0] * line_x + b) / w[1]
