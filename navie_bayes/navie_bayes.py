@@ -26,7 +26,7 @@ capital-loss 投资损失
 hours-per-week 每周工作时长
 """
 data = pd.read_csv("./adult.csv")
-for i in data.columns:
+for i in data.columns:  # 遍历列，删去缺失的数据
     data = data[-data["{}".format(i)].isin(["?"])]
 data = data.sample(frac=1, random_state=10).reset_index(drop=True)  # 随机打乱数据集
 
